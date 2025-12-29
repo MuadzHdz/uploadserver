@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Upload Server</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 400px;">
+        <header>
+            <h1>Login Required</h1>
+            <p>Please enter the password to access the server.</p>
+        </header>
+
+        <main>
+            <form method="post" action="{{ url_for('login') }}">
+                <input type="password" name="password" placeholder="Password" required style="width: 100%; margin-bottom: 1rem;">
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </main>
+    </div>
+</body>
+</html>

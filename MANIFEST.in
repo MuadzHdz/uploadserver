@@ -1,0 +1,3 @@
+graft uploadserver/static
+graft uploadserver/templates
+include uploadserver/py.typed

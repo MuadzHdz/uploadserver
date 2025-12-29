@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.~
+*.so
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+develop-eggs/
+eggs/
+sdist/
+wheelhouse/
+
+# Environment
+.env
+.venv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+
+# Other
+.DS_Store
