@@ -1,22 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="{{ theme }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Upload Server</title>
+    <title>Login - uploadserver</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-container main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .login-container form {
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: transparent;
+        }
+        
+
+        
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding-right: 45px;
+            box-sizing: border-box;
+            background: transparent;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+        
+        .flashes {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+
+
+        .top-bar {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div class="container" style="max-width: 400px;">
+
+    <div class="container login-container">
         <header>
-            <h1>Login Required</h1>
-            <p>Please enter the password to access the server.</p>
+            <h1>Login</h1>
         </header>
 
         <main>
             <form method="post" action="{{ url_for('login') }}">
-                <input type="password" name="password" placeholder="Password" required style="width: 100%; margin-bottom: 1rem;">
-                <button type="submit" class="btn" style="width: 100%;">Login</button>
+                <div class="input-group">
+                    <span class="material-icons">vpn_key</span>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    <span class="material-icons password-toggle" onclick="togglePassword()">visibility_off</span>
+                </div>
+                <button type="submit" class="btn">
+                    <span class="material-icons">login</span> Login
+                </button>
             </form>
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -29,5 +94,27 @@
             {% endwith %}
         </main>
     </div>
+
+    <div class="theme-switcher theme-carousel" aria-label="Theme switcher">
+        <button id="theme-prev" class="theme-btn" aria-label="Previous theme">&lt;</button>
+        <div class="theme-display" id="theme-display" role="status" aria-live="polite" tabindex="0"></div>
+        <button id="theme-next" class="theme-btn" aria-label="Next theme">&gt;</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggle = document.querySelector('.password-toggle');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggle.textContent = 'visibility';
+            } else {
+                passwordInput.type = 'password';
+                toggle.textContent = 'visibility_off';
+            }
+        }
+    </script>
 </body>
 </html>

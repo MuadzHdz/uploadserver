@@ -22,7 +22,6 @@ try:
 except ImportError:
     FLASK_AVAILABLE = False
 
-# --- Globals ---
 UPLOAD_DIRECTORY = os.getcwd()
 PASSWORD = None
 
@@ -44,12 +43,12 @@ def create_app():
 
     app = Flask(__name__)
     app.config['UPLOAD_FOLDER'] = UPLOAD_DIRECTORY
-    app.secret_key = os.urandom(24)  # Needed for sessions and flashing
+    app.secret_key = os.urandom(24) 
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
         if not PASSWORD:
-            return redirect(url_for('index')) # No password set, no login needed.
+            return redirect(url_for('index')) 
 
         if request.method == 'POST':
             if request.form.get('password') == PASSWORD:
@@ -59,7 +58,9 @@ def create_app():
                 return redirect(next_url or url_for('index'))
             else:
                 flash('Incorrect password.', 'error')
-        return render_template('login.html')
+        
+        theme = request.cookies.get('theme', 'tokyo-night')
+        return render_template('login.html', theme=theme)
 
     @app.route('/logout')
     def logout():
@@ -70,44 +71,79 @@ def create_app():
     @app.route('/')
     @login_required
     def index():
+        return redirect(url_for('browse', path=''))
+
+    @app.route('/browse/')
+    @app.route('/browse/<path:path>')
+    @login_required
+    def browse(path=''):
+        current_dir = os.path.join(UPLOAD_DIRECTORY, path)
+
+        if not os.path.isdir(current_dir) or not current_dir.startswith(UPLOAD_DIRECTORY):
+            flash("Error: Invalid or inaccessible directory.", "error")
+            return redirect(url_for('browse'))
+
         try:
-            files = [f for f in os.listdir(UPLOAD_DIRECTORY) if os.path.isfile(os.path.join(UPLOAD_DIRECTORY, f))]
+            items = os.listdir(current_dir)
+            dirs = [d for d in items if os.path.isdir(os.path.join(current_dir, d))]
+            files = [f for f in items if os.path.isfile(os.path.join(current_dir, f))]
+            dirs.sort(key=lambda d: d.lower())
             files.sort(key=lambda f: f.lower())
         except OSError:
-            files = []
+            dirs, files = [], []
             flash("Error: Could not read directory contents.", "error")
-        
-        return render_template('index.html', files=files)
 
-    @app.route('/upload', methods=['POST'])
+        parent_dir = os.path.dirname(path) if path else None
+
+        theme = request.cookies.get('theme', 'tokyo-night')
+
+        return render_template('index.html', files=files, dirs=dirs, current_path=path, parent_dir=parent_dir, theme=theme)
+
+    @app.route('/upload/', methods=['POST'])
+    @app.route('/upload/<path:path>', methods=['POST'])
     @login_required
-    def upload_file():
+    def upload_file(path=''):
         if 'file' not in request.files:
             flash('No file part in the request.', 'error')
-            return redirect(url_for('index'))
+            return redirect(url_for('browse', path=path))
         
         file = request.files['file']
         if file.filename == '':
             flash('No file selected.', 'error')
-            return redirect(url_for('index'))
+            return redirect(url_for('browse', path=path))
         
         if file:
             filename = secure_filename(file.filename)
             if not filename:
                 flash('Invalid filename.', 'error')
-                return redirect(url_for('index'))
+                return redirect(url_for('browse', path=path))
             
+            upload_path = os.path.join(app.config['UPLOAD_FOLDER'], path, filename)
+
+            if not os.path.abspath(upload_path).startswith(os.path.abspath(app.config['UPLOAD_FOLDER'])):
+                flash('Invalid path.', 'error')
+                return redirect(url_for('browse', path=path))
+
             try:
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                flash(f'File "{filename}" uploaded successfully!', 'success')
+                file.save(upload_path)
+                flash(f'File "{filename}" uploaded successfully to /{path}!', 'success')
             except Exception as e:
                 flash(f'Error saving file: {e}', 'error')
             
-            return redirect(url_for('index'))
+            return redirect(url_for('browse', path=path))
 
-    @app.route('/uploads/<path:filename>')
+    @app.route('/download/<path:filename>')
     @login_required
     def serve_file(filename):
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if not os.path.abspath(file_path).startswith(os.path.abspath(app.config['UPLOAD_FOLDER'])):
+            flash('Invalid path.', 'error')
+            return redirect(url_for('browse'))
+        
+        if not os.path.isfile(file_path):
+            flash('File not found.', 'error')
+            return redirect(url_for('browse'))
+
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
     return app
@@ -214,7 +250,7 @@ def main():
     qr_thread.start()
 
     if args.open:
-        # Open browser in a separate thread after a short delay
+
         threading.Timer(1, lambda: webbrowser.open(url)).start()
 
     app.run(host=args.bind, port=args.port, debug=False)

@@ -1,7 +1,6 @@
 import re
 from setuptools import setup, find_packages
 
-# Read version from __init__.py
 with open("uploadserver/__init__.py", "r", encoding="utf-8") as f:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 
