@@ -14,7 +14,7 @@ setup(
     author_email="adzhdz73@gmail.com",
     description="A simple, modern file server with upload, password protection, and QR code access.",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="",
     url="https://github.com/MuadzHdz/uploadserver",
     packages=find_packages(),
     include_package_data=True,

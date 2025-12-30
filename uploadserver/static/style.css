@@ -41,14 +41,14 @@
 }
 
 [data-theme="tokyo-night"] {
-    --bg: #1a1b26;
+    --bg: #414868;
     --fg: #c0caf5;
     --subtle: #565f89;
     --surface: #24283b;
-    --overlay: #414868;
+    --overlay: #313244;
     --primary: #bb9af7;
     --secondary: #7aa2f7;
-    --accent: #e0af68;
+    --accent: #f7768e;
     --success: #9ece6a;
     --error: #f7768e;
     --border-radius: 12px;
@@ -133,7 +133,7 @@
     --overlay: #504945;
     --primary: #d3869b;
     --secondary: #83a598;
-    --accent: #fabd2f;
+    --accent: #504945;
     --success: #b8bb26;
     --error: #fb4934;
     --border-radius: 12px;
@@ -263,6 +263,8 @@
 
 *, *::before, *::after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -271,15 +273,15 @@ body {
     animation: gradientShift 15s ease infinite;
     color: var(--fg);
     font-family: var(--font-sans);
-    margin: 0;
-    padding: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     transition: background-color var(--transition-speed), color var(--transition-speed);
-    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem;
+    width: 100%;
 }
 
 @keyframes gradientShift {
@@ -291,9 +293,9 @@ body {
 .container {
     width: 100%;
     max-width: 900px;
-    margin: 2rem 1rem;
-    max-height: calc(100vh - 3.5rem);
-    overflow: hidden;
+    margin: 2rem auto;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
     background-color: rgba(var(--surface), 0.5);
     border: 1px solid var(--overlay);
     border-radius: var(--border-radius);
@@ -308,31 +310,6 @@ body {
     opacity: 0;
     animation: fadeIn 0.8s ease-out forwards;
     animation-delay: 0.5s;
-}
-
-.upload-section { width: 100%; display: flex; flex-direction: column; gap: 1rem; }
-.upload-section .upload-inner { width: 100%; }
-.recent-uploads-top { margin-bottom: 0.5rem; }
-.recent-uploads { list-style: none; padding: 0; margin: 0; color: var(--subtle); max-height: 160px; overflow: auto; }
-.recent-uploads li { padding: 0.35rem 0; display: flex; gap: 0.5rem; align-items: center; }
-
-@media (min-width: 900px) {
-    .upload-section .file-input-label,
-    .upload-section .btn {
-        max-width: 520px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-.upload-side .muted { color: var(--subtle); }
-
-@media (min-width: 900px) {
-    .upload-section .file-input-label,
-    .upload-section .btn {
-        max-width: 680px;
-        margin-left: auto;
-        margin-right: auto;
-    }
 }
 
 @keyframes fadeIn {
@@ -363,12 +340,19 @@ body {
 .login-container {
     max-width: 400px;
     padding: 2rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 header {
     text-align: center;
     margin-bottom: 2.5rem;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 header h1 {
@@ -382,24 +366,18 @@ header h1 {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    text-align: center;
 }
 
 .theme-switcher {
     margin-bottom: 1rem;
-    align-self: flex-end;
-    margin-right: 1rem;
+    align-self: center;
     z-index: 10;
-}
-
-@media (max-width: 767px) {
-    .theme-switcher {
-        margin-right: 0.5rem;
-    }
 }
 
 .theme-switcher.theme-carousel {
     position: fixed;
-    bottom: 18px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -408,21 +386,10 @@ header h1 {
     background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
     border: 1px solid var(--overlay);
     border-radius: 999px;
-    padding: 6px;
+    padding: 8px;
     z-index: 1000;
     backdrop-filter: blur(6px);
-}
-
-@media (max-width: 420px) {
-    .theme-switcher.theme-carousel {
-        bottom: 12px;
-        padding: 4px;
-    }
-    .theme-carousel .theme-display {
-        min-width: 120px;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.95rem;
-    }
+    -webkit-backdrop-filter: blur(6px);
 }
 
 .theme-carousel .theme-btn {
@@ -433,6 +400,9 @@ header h1 {
     font-size: 1rem;
     cursor: pointer;
     border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .theme-carousel .theme-btn:hover {
@@ -440,24 +410,21 @@ header h1 {
     color: var(--primary);
 }
 
-.theme-switcher.theme-carousel {
-    --theme-switcher-width: 260px;
-}
-
 .theme-carousel .theme-display {
-    width: var(--theme-switcher-width);
-    max-width: 90vw;
+    width: 180px;
+    min-width: 150px;
     position: relative;
     overflow: hidden;
     color: var(--fg);
-    padding: 0.35rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     font-family: var(--font-mono);
     font-weight: 600;
     border-radius: 6px;
     height: 2.1em;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     transition: background-color 220ms ease, color 220ms ease;
 }
 
@@ -483,11 +450,21 @@ header h1 {
 .theme-display .exit-to-left { transform: translateX(-120%) translateY(-50%); opacity: 0; }
 .theme-display .exit-to-right { transform: translateX(120%) translateY(-50%); opacity: 0; }
 
-.theme-carousel .theme-btn:hover { background: var(--overlay); color: var(--primary); }
-.theme-carousel .theme-btn.pressed { background: var(--overlay); color: var(--primary); transform: scale(0.98); }
+.theme-carousel .theme-btn.pressed { 
+    background: var(--overlay); 
+    color: var(--primary); 
+    transform: scale(0.98); 
+}
 
-@media (max-width: 420px) {
-    .theme-carousel .theme-display { width: calc(100vw - 80px); }
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .flashes li {
@@ -501,26 +478,12 @@ header h1 {
     pointer-events: none;
 }
 
-header h1 {
-    font-size: 2rem;
+.flashes .success {
+    color: var(--success);
 }
 
-.file-list-section a {
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-}
-
-.file-list-section a .material-icons,
-.file-input-label .material-icons {
-    font-size: 1.2rem;
-}
-
-.file-input-label {
-    padding: 2.25rem;
-}
-
-.btn {
-    max-width: 260px;
+.flashes .error {
+    color: var(--error);
 }
 
 main {
@@ -542,17 +505,32 @@ main {
 
 .file-list-section {
     min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .file-list-section ul {
     max-height: 60vh;
     overflow-y: auto;
     padding-right: 0.5rem;
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.file-list-section ul::-webkit-scrollbar { width: 8px; }
-.file-list-section ul::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.04); border-radius: 6px; }
-.file-list-section ul::-webkit-scrollbar-track { background: transparent; }
+.file-list-section ul::-webkit-scrollbar { 
+    width: 8px; 
+}
+.file-list-section ul::-webkit-scrollbar-thumb { 
+    background: rgba(255,255,255,0.04); 
+    border-radius: 6px; 
+}
+.file-list-section ul::-webkit-scrollbar-track { 
+    background: transparent; 
+}
 
 h2, h3 {
     font-family: var(--font-mono);
@@ -562,16 +540,8 @@ h2, h3 {
     margin: 0 0 1rem 0;
     font-weight: normal;
     transition: color var(--transition-speed), border-bottom var(--transition-speed);
-}
-
-.file-list-section {
     width: 100%;
-}
-
-.file-list-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    text-align: center;
 }
 
 .file-list-section a {
@@ -579,10 +549,18 @@ h2, h3 {
     text-decoration: none;
     display: flex;
     align-items: center;
-    padding: 0.6rem 0.8rem;
+    padding: 0.75rem 1rem;
     border-radius: 6px;
     transition: background-color var(--transition-speed), color var(--transition-speed);
-    word-break: break-all;
+    word-break: break-word;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.file-list-section a span {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
 .file-list-section a:hover {
@@ -597,12 +575,17 @@ h2, h3 {
 
 .upload-section {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .upload-section form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    width: 100%;
+    align-items: center;
 }
 
 input[type="file"] {
@@ -617,6 +600,7 @@ input[type="file"] {
     padding: 2.25rem 1.25rem;
     min-height: 160px;
     width: 100%;
+    max-width: 600px;
     text-align: center;
     cursor: pointer;
     transition: border-color var(--transition-speed), background-color var(--transition-speed), transform 180ms ease;
@@ -642,20 +626,11 @@ input[type="file"] {
 
 .upload-section .btn {
     width: 100%;
-    max-width: none;
+    max-width: 600px;
     padding: 1rem 1.25rem;
     border-radius: 8px;
     font-size: 1rem;
     margin-top: 0.75rem;
-}
-
-@media (min-width: 900px) {
-    .upload-section .file-input-label,
-    .upload-section .btn {
-        max-width: 520px;
-        margin-left: auto;
-        margin-right: auto;
-    }
 }
 
 .login-container form {
@@ -663,6 +638,7 @@ input[type="file"] {
     flex-direction: column;
     gap: 1rem;
     align-items: center;
+    width: 100%;
 }
 
 .login-container .input-group {
@@ -744,27 +720,16 @@ input[type="file"] {
     transform: translateY(-2px);
 }
 
-.flashes {
-    list-style: none;
-    padding: 0;
-    margin-top: 1rem;
-    text-align: center;
-}
-
-.flashes .success {
-    color: var(--success);
-}
-
-.flashes .error {
-    color: var(--error);
-}
-
 footer {
     text-align: center;
     margin-top: 2.5rem;
     color: var(--subtle);
     font-size: 0.9rem;
     transition: color var(--transition-speed);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 footer a {
@@ -774,4 +739,282 @@ footer a {
 
 footer a:hover {
     color: var(--primary);
+}
+
+
+@media (min-width: 768px) {
+    .container {
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+    
+    .theme-carousel .theme-display {
+        width: 220px;
+    }
+    
+    .upload-section .file-input-label,
+    .upload-section .btn {
+        max-width: 500px;
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        padding: 0.75rem;
+        justify-content: flex-start;
+    }
+    
+    .container {
+        margin: 1rem auto;
+        padding: 1.25rem;
+        max-height: none;
+        overflow-y: visible;
+        width: calc(100% - 1rem);
+    }
+    
+    header {
+        margin-bottom: 1.5rem;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    main {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding-right: 0;
+    }
+    
+    .file-list-section ul {
+        max-height: 40vh;
+    }
+    
+    .upload-section .file-input-label {
+        padding: 1.5rem 1rem;
+        min-height: 120px;
+    }
+    
+    .theme-switcher.theme-carousel {
+        position: fixed;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        padding: 6px;
+    }
+    
+    .theme-carousel .theme-display {
+        width: 160px;
+        min-width: 140px;
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .theme-carousel .theme-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn {
+        max-width: 100%;
+    }
+    
+    .login-container {
+        padding: 1.5rem;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0.5rem;
+    }
+    
+    .container {
+        padding: 1rem;
+        margin: 0.5rem auto;
+        width: calc(100% - 0.5rem);
+        border-radius: 10px;
+        max-height: 720px;
+    }
+
+    .container.login-container {
+        max-width: 400px;
+        padding: 2.5rem 2rem;
+        margin: auto; 
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-height: auto;
+        max-height: auto;
+        overflow: visible;
+        width: 90%; 
+    }
+
+    .container.login-container {
+        max-width: 400px;
+        padding: 2.5rem 2rem;
+        margin: auto;
+        position: relative;
+        top: 0;
+        left: 0;
+        transform: none;
+        min-height: auto;
+        max-height: auto;
+        overflow: visible;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2, h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .file-list-section a {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .file-list-section a .material-icons {
+        font-size: 1rem;
+    }
+    
+    .upload-section .file-input-label {
+        padding: 1rem;
+        min-height: 100px;
+        font-size: 0.9rem;
+    }
+    
+    .upload-section .btn {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .theme-switcher.theme-carousel {
+        bottom: 10px;
+        padding: 4px;
+    }
+    
+    .theme-carousel .theme-display {
+        width: 140px;
+        min-width: 120px;
+        font-size: 0.85rem;
+        padding: 0.35rem 0.5rem;
+    }
+    
+    .theme-carousel .theme-btn {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .color-palette-display {
+        margin-top: -1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .color-swatch {
+        width: 16px;
+        height: 16px;
+    }
+    
+    footer {
+        margin-top: 1.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1000px;
+        max-height: 850px;
+    }
+
+    .login-container {
+        max-width: 420px;
+    }
+    
+    .theme-carousel .theme-display {
+        width: 240px;
+    }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+    .container {
+        max-height: 90vh;
+        overflow-y: auto;
+        margin: 0.5rem auto;
+    }
+    
+    .file-list-section ul {
+        max-height: 30vh;
+    }
+    
+    .theme-switcher.theme-carousel {
+        bottom: 10px;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    body {
+        animation: none;
+    }
+}
+
+@media (prefers-contrast: high) {
+    :root {
+        --border-radius: 4px;
+        --blur: 0px;
+    }
+    
+    .container {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background-color: var(--surface);
+    }
+}
+
+
+
+@media print {
+    .theme-switcher,
+    .upload-section,
+    .btn,
+    footer {
+        display: none !important;
+    }
+    
+    .container {
+        border: none;
+        background: white;
+        color: black;
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .file-list-section ul {
+        max-height: none;
+        overflow: visible;
+    }
 }

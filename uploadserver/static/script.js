@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        ['dragenter', 'dragover', 'drafeave', 'drop'].forEach(eventName => {
             dropArea.addEventListener(eventName, preventDefaults, false);
             document.body.addEventListener(eventName, preventDefaults, false); 
         });
