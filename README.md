@@ -34,20 +34,28 @@ $ uploadserver --password
 
 To set up and run `uploadserver` from its source repository:
 
-1.  **Clone the Repository:**
+1.  **Clone the Repository:** 
     
     ```bash
-    git clone https://github.com/MuadzHdz/uploadserver.git # Ganti dengan URL repo Andacd uploadserver
+    git clone https://github.com/MuadzHdz/uploadserver.git
     ```
-    
-2.  **Install Dependencies:**It's recommended to use a virtual environment.
-    
+
     ```bash
-    python -m venv venvsource venv/bin/activate  # On Windows, use `venvScriptsactivate`pip install Flask Werkzeug "qrcode[pil]"
+    cd uploadserver
     ```
     
-3.  **Install in Editable Mode (Optional, for Development):**If you plan to modify the code, you can install it in editable mode:
+2.  **Install Dependencies:** It's recommended to use a virtual environment.
+
+    ```bash
+    python -m venv venv
+    ```
+
+    ```bash
+    source venv/bin/activate
+    ```
     
+3.  **Install in Editable Mode (Optional, for Development):** If you plan to modify the code, you can install it in editable mode:
+
     ```bash
     pip install -e .
     ```
@@ -81,7 +89,6 @@ Default
 `-d`
 
 The directory to serve files from and save uploads to.
-
 Current Directory
 
 `--port <number>`
@@ -149,13 +156,6 @@ N/A
 
 ---
 
-### Project Structure
-
-```
-uploadserver/├── __init__.py          # Project version and package initialization├── __main__.py          # Entry point for `python -m uploadserver`├── server.py            # Core server logic (Flask app, routing, file handling)├── static/              # Static assets (CSS, JavaScript)│   ├── script.js│   └── style.css└── templates/           # HTML templates for web interface    ├── index.html       # Main file browsing and upload page    └── login.html       # Login page for password-protected servers
-```
-
----
 
 ### Contributing
 
