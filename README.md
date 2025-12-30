@@ -53,6 +53,10 @@ To set up and run `uploadserver` from its source repository:
     ```bash
     source venv/bin/activate
     ```
+
+    ```bash
+    pip install Flask Werkzeug "qrcode[pil]"
+    ```
     
 3.  **Install in Editable Mode (Optional, for Development):** If you plan to modify the code, you can install it in editable mode:
 
