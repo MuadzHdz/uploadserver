@@ -544,7 +544,28 @@ h2, h3 {
     text-align: center;
 }
 
-.file-list-section a {
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-radius: 6px;
+    transition: background-color var(--transition-speed);
+}
+
+.file-item:hover {
+    background-color: var(--overlay);
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.file-info a {
     color: var(--fg);
     text-decoration: none;
     display: flex;
@@ -554,7 +575,46 @@ h2, h3 {
     transition: background-color var(--transition-speed), color var(--transition-speed);
     word-break: break-word;
     gap: 0.5rem;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.25rem;
+    margin-right: 0.5rem;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: var(--subtle);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background-color: var(--surface);
+    color: var(--primary);
+}
+
+.action-btn.delete-btn:hover {
+    background-color: var(--error);
+    color: var(--bg);
+}
+
+.preview-link {
+    color: var(--secondary) !important;
+}
+
+.preview-link:hover {
+    color: var(--primary) !important;
+    background-color: var(--overlay) !important;
 }
 
 .file-list-section a span {
@@ -997,11 +1057,203 @@ footer a:hover {
 
 
 
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--surface);
+    border: 1px solid var(--overlay);
+    border-radius: var(--border-radius);
+    padding: 0;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--overlay);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--primary);
+    font-family: var(--font-mono);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--subtle);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all var(--transition-speed);
+}
+
+.modal-close:hover {
+    background-color: var(--overlay);
+    color: var(--error);
+}
+
+.modal-content form {
+    padding: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.btn.secondary {
+    background-color: var(--surface);
+    color: var(--fg);
+    border: 1px solid var(--overlay);
+}
+
+.btn.secondary:hover {
+    background-color: var(--overlay);
+    color: var(--primary);
+}
+
+.btn.delete-btn {
+    background-color: var(--error);
+    color: var(--bg);
+}
+
+.btn.delete-btn:hover {
+    background-color: var(--accent);
+    color: var(--bg);
+}
+
+/* Mkdir section styles */
+.mkdir-section {
+    margin-bottom: 1.5rem;
+}
+
+.mkdir-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    align-items: center;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 400px;
+    background-color: var(--surface);
+    border: 1px solid var(--overlay);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    transition: border-color var(--transition-speed), background-color var(--transition-speed);
+}
+
+.input-group:focus-within {
+    border-color: var(--primary);
+}
+
+.input-group .material-icons {
+    color: var(--subtle);
+    flex-shrink: 0;
+}
+
+.input-group input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--fg);
+    padding: 0;
+    font-size: 1rem;
+    -webkit-appearance: none;
+    appearance: none;
+    box-shadow: none;
+    caret-color: var(--fg);
+}
+
+.input-group input::placeholder {
+    color: var(--subtle);
+}
+
+.btn.small-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    min-width: auto;
+    white-space: nowrap;
+}
+
+/* Progress bar styles */
+.progress-container {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 1rem;
+    display: none;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--surface);
+    border: 1px solid var(--overlay);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--primary);
+    transition: width 0.3s ease;
+    border-radius: 3px;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--subtle);
+}
+
 @media print {
     .theme-switcher,
     .upload-section,
     .btn,
-    footer {
+    footer,
+    .file-actions,
+    .mkdir-section {
         display: none !important;
     }
     
@@ -1016,5 +1268,13 @@ footer a:hover {
     .file-list-section ul {
         max-height: none;
         overflow: visible;
+    }
+    
+    .file-item {
+        display: block;
+    }
+    
+    .file-info a {
+        color: black !important;
     }
 }

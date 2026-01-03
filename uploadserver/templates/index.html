@@ -32,13 +32,44 @@
                         </li>
                     {% endif %}
                     {% for d in dirs %}
-                        <li>
-                            <a href="{{ url_for('browse', path=current_path + '/' + d if current_path else d) }}"><span class="material-icons">folder</span>&nbsp;&nbsp;&nbsp;<span>{{ d }}</span></a>
+                        <li class="file-item">
+                            <div class="file-info">
+                                <a href="{{ url_for('browse', path=current_path + '/' + d if current_path else d) }}">
+                                    <span class="material-icons">folder</span>
+                                    <span>{{ d }}</span>
+                                </a>
+                            </div>
+                            <div class="file-actions">
+                                <button class="action-btn" onclick="showRenameDialog('{{ current_path + '/' + d if current_path else d }}', 'directory')" title="Rename">
+                                    <span class="material-icons">edit</span>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="confirmDelete('{{ current_path + '/' + d if current_path else d }}', 'directory')" title="Delete">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </div>
                         </li>
                     {% endfor %}
                     {% for f in files %}
-                        <li>
-                            <a href="{{ url_for('serve_file', filename=current_path + '/' + f if current_path else f) }}"><span class="material-icons">insert_drive_file</span>&nbsp;&nbsp;&nbsp;<span>{{ f }}</span></a>
+                        <li class="file-item">
+                            <div class="file-info">
+                                {% if f|file_previewable %}
+                                    <a href="{{ url_for('preview_file', filename=current_path + '/' + f if current_path else f) }}" class="preview-link">
+                                        <span class="material-icons">visibility</span>
+                                    </a>
+                                {% endif %}
+                                <a href="{{ url_for('download', filename=current_path + '/' + f if current_path else f) }}">
+                                    <span class="material-icons">insert_drive_file</span>
+                                    <span>{{ f }}</span>
+                                </a>
+                            </div>
+                            <div class="file-actions">
+                                <button class="action-btn" onclick="showRenameDialog('{{ current_path + '/' + f if current_path else f }}', 'file')" title="Rename">
+                                    <span class="material-icons">edit</span>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="confirmDelete('{{ current_path + '/' + f if current_path else f }}', 'file')" title="Delete">
+                                    <span class="material-icons">delete</span>
+                                </button>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>
@@ -48,6 +79,18 @@
             </div>
 
             <div class="upload-section">
+                <h2>File Management</h2>
+                
+                <div class="mkdir-section">
+                    <form action="{{ url_for('create_directory', path=current_path) }}" method="post" class="mkdir-form">
+                        <div class="input-group">
+                            <span class="material-icons">create_new_folder</span>
+                            <input type="text" name="dir_name" placeholder="New directory name" required>
+                            <button type="submit" class="btn small-btn">Create</button>
+                        </div>
+                    </form>
+                </div>
+
                 <h2>Upload</h2>
 
                 {% if recent_uploads is defined and recent_uploads %}
@@ -67,6 +110,12 @@
                     </label>
                     <input type="file" name="file" id="file-input" required>
                     <button type="submit" class="btn">Upload</button>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-text"></div>
+                    </div>
                 </form>
 
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -85,6 +134,78 @@
             <p>Powered by <a href="https://github.com/MuadzHdz/uploadserver" target="_blank">MuadzHdz</a></p>
         </footer>
     </div>
+
+    <!-- Modal for rename dialog -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Rename</h3>
+                <button class="modal-close" onclick="closeRenameModal()">&times;</button>
+            </div>
+            <form id="renameForm" method="post">
+                <div class="input-group">
+                    <input type="hidden" id="renamePath" name="filename">
+                    <input type="text" id="newName" name="new_name" placeholder="New name" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn secondary" onclick="closeRenameModal()">Cancel</button>
+                    <button type="submit" class="btn">Rename</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for delete confirmation -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Delete</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <p>Are you sure you want to delete "<span id="deleteItemName"></span>"?</p>
+            <form id="deleteForm" method="post">
+                <div class="modal-actions">
+                    <button type="button" class="btn secondary" onclick="closeDeleteModal()">Cancel</button>
+                    <button type="submit" class="btn delete-btn">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function showRenameDialog(path, type) {
+            document.getElementById('renamePath').value = path;
+            document.getElementById('newName').value = path.split('/').pop();
+            document.getElementById('renameForm').action = '/rename/' + path;
+            document.getElementById('renameModal').style.display = 'flex';
+        }
+
+        function closeRenameModal() {
+            document.getElementById('renameModal').style.display = 'none';
+        }
+
+        function confirmDelete(path, type) {
+            document.getElementById('deleteItemName').textContent = path.split('/').pop();
+            document.getElementById('deleteForm').action = '/delete/' + path;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const renameModal = document.getElementById('renameModal');
+            const deleteModal = document.getElementById('deleteModal');
+            if (event.target == renameModal) {
+                closeRenameModal();
+            }
+            if (event.target == deleteModal) {
+                closeDeleteModal();
+            }
+        }
+    </script>
 </body>
 </html>

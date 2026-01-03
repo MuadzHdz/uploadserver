@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        ['dragenter', 'dragover', 'drafeave', 'drop'].forEach(eventName => {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropArea.addEventListener(eventName, preventDefaults, false);
             document.body.addEventListener(eventName, preventDefaults, false); 
         });
@@ -204,5 +204,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateColorPaletteDisplay();
 
+    // Upload progress handling
+    const uploadForm = document.getElementById('upload-form');
+    const progressContainer = document.querySelector('.progress-container');
+    const progressBar = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('file-input');
+            if (!fileInput.files.length) {
+                return;
+            }
+
+            const formData = new FormData(uploadForm);
+            const xhr = new XMLHttpRequest();
+
+            // Show progress container
+            if (progressContainer) {
+                progressContainer.style.display = 'block';
+            }
+
+            // Upload progress
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    if (progressBar) {
+                        progressBar.style.width = percentComplete + '%';
+                    }
+                    if (progressText) {
+                        progressText.textContent = `Uploading: ${Math.round(percentComplete)}%`;
+                    }
+                }
+            });
+
+            // Upload complete
+            xhr.addEventListener('load', function() {
+                if (xhr.status === 200) {
+                    if (progressBar) {
+                        progressBar.style.width = '100%';
+                    }
+                    if (progressText) {
+                        progressText.textContent = 'Upload complete!';
+                    }
+                    
+                    // Reset form after a short delay
+                    setTimeout(() => {
+                        uploadForm.reset();
+                        if (fileInputLabel) {
+                            fileInputLabel.innerHTML = `<span class="material-icons">cloud_upload</span> Drag & Drop files here or Click to select`;
+                        }
+                        if (progressContainer) {
+                            progressContainer.style.display = 'none';
+                        }
+                        if (progressBar) {
+                            progressBar.style.width = '0%';
+                        }
+                        if (progressText) {
+                            progressText.textContent = '';
+                        }
+                        // Redirect to show flash messages
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    if (progressText) {
+                        progressText.textContent = 'Upload failed!';
+                    }
+                }
+            });
+
+            // Upload error
+            xhr.addEventListener('error', function() {
+                if (progressText) {
+                    progressText.textContent = 'Upload error!';
+                }
+            });
+
+            // Send the request
+            xhr.open('POST', uploadForm.action);
+            xhr.send(formData);
+        });
+    }
 
 });

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - {{ config.get('site_name', 'UploadServer Pro') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .admin-header {
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-title {
+            font-size: 2rem;
+            color: var(--primary);
+            font-family: var(--font-mono);
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform var(--transition-speed);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--subtle);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-family: var(--font-mono);
+            border-bottom: 1px solid var(--overlay);
+            padding-bottom: 0.5rem;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .user-table th,
+        .user-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--overlay);
+        }
+        
+        .user-table th {
+            background: var(--overlay);
+            color: var(--fg);
+            font-weight: 600;
+        }
+        
+        .user-table tr:hover {
+            background: var(--overlay);
+        }
+        
+        .activity-log {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--overlay);
+            border-radius: 6px;
+        }
+        
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--overlay);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: var(--bg);
+        }
+        
+        .activity-details {
+            flex: 1;
+        }
+        
+        .activity-user {
+            font-weight: 600;
+            color: var(--fg);
+        }
+        
+        .activity-action {
+            color: var(--subtle);
+            font-size: 0.9rem;
+        }
+        
+        .activity-time {
+            color: var(--subtle);
+            font-size: 0.85rem;
+        }
+        
+        .chart-container {
+            grid-column: span 2;
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            height: 400px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-admin {
+            background: var(--error);
+            color: white;
+        }
+        
+        .badge-user {
+            background: var(--primary);
+            color: var(--bg);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div>
+                <h1 class="admin-title">Admin Dashboard</h1>
+                <p style="color: var(--subtle); margin: 0.5rem 0 0 0;">System Overview & Management</p>
+            </div>
+            <div class="admin-actions">
+                <a href="{{ url_for('dashboard') }}" class="btn" style="background: var(--surface); color: var(--fg);">
+                    <span class="material-icons">home</span> User Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn">
+                    <span class="material-icons">logout</span> Logout
+                </a>
+            </div>
+        </header>
+
+        <!-- Statistics Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ active_users }}</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_files }}</div>
+                <div class="stat-label">Total Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ "%.1f"|format(total_storage / 1024 / 1024 / 1024) }} GB</div>
+                <div class="stat-label">Total Storage Used</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- User Statistics -->
+            <div class="section">
+                <h2 class="section-title">User Statistics</h2>
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Files</th>
+                                <th>Storage Used</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user_stat in user_stats %}
+                            <tr>
+                                <td>
+                                    <span class="material-icons" style="font-size: 1rem; margin-right: 0.5rem; vertical-align: middle;">person</span>
+                                    {{ user_stat.username }}
+                                </td>
+                                <td>{{ user_stat.file_count or 0 }}</td>
+                                <td>{{ "%.1f"|format((user_stat.total_size or 0) / 1024 / 1024) }} MB</td>
+                                <td>
+                                    <span class="badge badge-user">Active</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="section">
+                <h2 class="section-title">Recent Activities</h2>
+                <div class="activity-log">
+                    {% for activity in recent_activities %}
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <span class="material-icons">
+                                {% if activity.action == 'upload' %}upload_file
+                                {% elif activity.action == 'download' %}download
+                                {% elif activity.action == 'delete' %}delete
+                                {% elif activity.action == 'login' %}login
+                                {% elif activity.action == 'logout' %}logout
+                                {% else %}info
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-user">{{ activity.user.username if activity.user else 'System' }}</div>
+                            <div class="activity-action">
+                                {% if activity.action == 'upload' %}Uploaded file
+                                {% elif activity.action == 'download' %}Downloaded file
+                                {% elif activity.action == 'delete' %}Deleted file
+                                {% elif activity.action == 'login' %}Logged in
+                                {% elif activity.action == 'logout' %}Logged out
+                                {% else %}File activity
+                                {% endif %}
+                            </div>
+                            <div class="activity-time">{{ activity.created_at.strftime('%H:%M on %b %d') }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Storage Usage Chart -->
+        <div class="chart-container">
+            <h2 class="section-title">Storage Usage Over Time</h2>
+            <canvas id="storageChart"></canvas>
+        </div>
+    </div>
+
+    <div class="theme-switcher theme-carousel" aria-label="Theme switcher">
+        <button id="theme-prev" class="theme-btn" aria-label="Previous theme">&lt;</button>
+        <div class="theme-display" id="theme-display" role="status" aria-live="polite" tabindex="0"></div>
+        <button id="theme-next" class="theme-btn" aria-label="Next theme">&gt;</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Storage Chart
+        const ctx = document.getElementById('storageChart').getContext('2d');
+        const storageChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for user_stat in user_stats %}'{{ user_stat.username }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Storage Usage (MB)',
+                    data: [{% for user_stat in user_stats %}{{ (user_stat.total_size or 0) / 1024 / 1024 }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: 'var(--primary)',
+                    borderColor: 'var(--accent)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'var(--overlay)'
+                        },
+                        ticks: {
+                            color: 'var(--subtle)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Storage (MB)',
+                            color: 'var(--subtle)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'var(--overlay)'
+                        },
+                        ticks: {
+                            color: 'var(--subtle)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Real-time updates
+        const socket = io();
+        
+        socket.on('system_message', function(data) {
+            showNotification(data.message, data.type);
+        });
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span class="material-icons">${type === 'error' ? 'error' : 'info'}</span>
+                ${message}
+            `;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--${type === 'error' ? 'error' : 'primary'});
+                color: var(--bg);
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 5000);
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

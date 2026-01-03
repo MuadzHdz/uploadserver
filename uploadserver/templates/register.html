@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - {{ config.get('site_name', 'UploadServer Pro') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .register-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .register-header h1 {
+            color: var(--primary);
+            font-family: var(--font-mono);
+            margin-bottom: 0.5rem;
+        }
+        
+        .register-header p {
+            color: var(--subtle);
+            margin: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--fg);
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--overlay);
+            border-radius: 6px;
+            color: var(--fg);
+            font-size: 1rem;
+            transition: border-color var(--transition-speed);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+            height: 4px;
+            background: var(--overlay);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .password-strength-fill {
+            height: 100%;
+            transition: width var(--transition-speed), background-color var(--transition-speed);
+        }
+        
+        .strength-weak { background: var(--error); width: 33%; }
+        .strength-medium { background: var(--accent); width: 66%; }
+        .strength-strong { background: var(--success); width: 100%; }
+        
+        .btn-register {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .btn-register:hover {
+            background: var(--accent);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--subtle);
+        }
+        
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .validation-message {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            color: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <header class="register-header">
+            <h1>Create Account</h1>
+            <p>Join {{ config.get('site_name', 'UploadServer Pro') }} to start sharing files</p>
+        </header>
+
+        <form method="post" action="{{ url_for('register') }}" id="register-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required 
+                       pattern="[a-zA-Z0-9_]{3,20}" 
+                       title="Username must be 3-20 characters, letters, numbers, and underscores only">
+                <div class="validation-message" id="username-validation"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+                <div class="validation-message" id="email-validation"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name" required>
+                <div class="validation-message" id="name-validation"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required 
+                       minlength="8" 
+                       title="Password must be at least 8 characters long">
+                <div class="password-strength">
+                    <div class="password-strength-fill" id="strength-fill"></div>
+                </div>
+                <div class="validation-message" id="password-validation"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+                <div class="validation-message" id="confirm-validation"></div>
+            </div>
+
+            <button type="submit" class="btn-register">
+                <span class="material-icons" style="margin-right: 0.5rem;">person_add</span>
+                Create Account
+            </button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+        </div>
+    </div>
+
+    <div class="theme-switcher theme-carousel" aria-label="Theme switcher">
+        <button id="theme-prev" class="theme-btn" aria-label="Previous theme">&lt;</button>
+        <div class="theme-display" id="theme-display" role="status" aria-live="polite" tabindex="0"></div>
+        <button id="theme-next" class="theme-btn" aria-label="Next theme">&gt;</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Form validation
+        const form = document.getElementById('register-form');
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const fullName = document.getElementById('full_name');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        
+        // Real-time validation
+        username.addEventListener('input', validateUsername);
+        email.addEventListener('input', validateEmail);
+        fullName.addEventListener('input', validateName);
+        password.addEventListener('input', validatePassword);
+        confirmPassword.addEventListener('input', validateConfirmPassword);
+        
+        function validateUsername() {
+            const value = username.value;
+            const validation = document.getElementById('username-validation');
+            
+            if (value.length < 3) {
+                validation.textContent = 'Username must be at least 3 characters';
+                return false;
+            }
+            if (value.length > 20) {
+                validation.textContent = 'Username must be less than 20 characters';
+                return false;
+            }
+            if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+                validation.textContent = 'Username can only contain letters, numbers, and underscores';
+                return false;
+            }
+            
+            validation.textContent = '';
+            return true;
+        }
+        
+        function validateEmail() {
+            const value = email.value;
+            const validation = document.getElementById('email-validation');
+            
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                validation.textContent = 'Please enter a valid email address';
+                return false;
+            }
+            
+            validation.textContent = '';
+            return true;
+        }
+        
+        function validateName() {
+            const value = fullName.value;
+            const validation = document.getElementById('name-validation');
+            
+            if (value.length < 2) {
+                validation.textContent = 'Name must be at least 2 characters';
+                return false;
+            }
+            
+            validation.textContent = '';
+            return true;
+        }
+        
+        function validatePassword() {
+            const value = password.value;
+            const validation = document.getElementById('password-validation');
+            const strengthFill = document.getElementById('strength-fill');
+            
+            if (value.length < 8) {
+                validation.textContent = 'Password must be at least 8 characters';
+                strengthFill.className = 'password-strength-fill';
+                return false;
+            }
+            
+            // Calculate password strength
+            let strength = 0;
+            if (/[a-z]/.test(value)) strength++;
+            if (/[A-Z]/.test(value)) strength++;
+            if (/[0-9]/.test(value)) strength++;
+            if (/[^a-zA-Z0-9]/.test(value)) strength++;
+            
+            strengthFill.className = 'password-strength-fill';
+            if (strength <= 2) {
+                strengthFill.classList.add('strength-weak');
+            } else if (strength === 3) {
+                strengthFill.classList.add('strength-medium');
+            } else {
+                strengthFill.classList.add('strength-strong');
+            }
+            
+            validation.textContent = '';
+            return true;
+        }
+        
+        function validateConfirmPassword() {
+            const value = confirmPassword.value;
+            const validation = document.getElementById('confirm-validation');
+            
+            if (value !== password.value) {
+                validation.textContent = 'Passwords do not match';
+                return false;
+            }
+            
+            validation.textContent = '';
+            return true;
+        }
+        
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate all fields
+            const isUsernameValid = validateUsername();
+            const isEmailValid = validateEmail();
+            const isNameValid = validateName();
+            const isPasswordValid = validatePassword();
+            const isConfirmValid = validateConfirmPassword();
+            
+            if (isUsernameValid && isEmailValid && isNameValid && 
+                isPasswordValid && isConfirmValid) {
+                form.submit();
+            }
+        });
+        
+        // Password strength indicator update
+        password.addEventListener('input', updatePasswordStrength);
+        
+        function updatePasswordStrength() {
+            const value = password.value;
+            const strengthFill = document.getElementById('strength-fill');
+            
+            if (value.length === 0) {
+                strengthFill.className = 'password-strength-fill';
+                return;
+            }
+            
+            let strength = 0;
+            if (/[a-z]/.test(value)) strength++;
+            if (/[A-Z]/.test(value)) strength++;
+            if (/[0-9]/.test(value)) strength++;
+            if (/[^a-zA-Z0-9]/.test(value)) strength++;
+            
+            strengthFill.className = 'password-strength-fill';
+            if (strength <= 2) {
+                strengthFill.classList.add('strength-weak');
+            } else if (strength === 3) {
+                strengthFill.classList.add('strength-medium');
+            } else {
+                strengthFill.classList.add('strength-strong');
+            }
+        }
+    </script>
+</body>
+</html>

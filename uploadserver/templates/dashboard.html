@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - {{ config.get('site_name', 'UploadServer Pro') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card-icon {
+            background: var(--primary);
+            color: var(--bg);
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-card-title {
+            color: var(--subtle);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--fg);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card-subtitle {
+            color: var(--subtle);
+            font-size: 0.85rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--overlay);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width var(--transition-speed);
+        }
+        
+        .recent-files-section, .recent-activities-section {
+            grid-column: span 2;
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+        }
+        
+        .recent-files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-card {
+            background: var(--bg);
+            border: 1px solid var(--overlay);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: transform var(--transition-speed);
+        }
+        
+        .file-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--overlay);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .activity-details {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .activity-action {
+            font-weight: 600;
+            color: var(--fg);
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-meta {
+            font-size: 0.85rem;
+            color: var(--subtle);
+        }
+        
+        .chart-container {
+            grid-column: span 2;
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            height: 300px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .recent-files-section, .recent-activities-section, .chart-container {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard</h1>
+            <div class="user-info">
+                <span class="material-icons">account_circle</span>
+                <span>{{ current_user.full_name or current_user.username }}</span>
+            </div>
+        </header>
+
+        <main class="dashboard-container">
+            <!-- Storage Statistics -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon">
+                        <span class="material-icons">storage</span>
+                    </div>
+                    <div class="stat-card-title">Storage Used</div>
+                </div>
+                <div class="stat-card-value">{{ "%.2f"|format(total_size / 1024 / 1024) }} MB</div>
+                <div class="stat-card-subtitle">of {{ "%.2f"|format(current_user.storage_quota / 1024 / 1024) }} MB</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ storage_percent }}%"></div>
+                </div>
+            </div>
+
+            <!-- Files Count -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon" style="background: var(--secondary);">
+                        <span class="material-icons">folder</span>
+                    </div>
+                    <div class="stat-card-title">Total Files</div>
+                </div>
+                <div class="stat-card-value">{{ total_files }}</div>
+                <div class="stat-card-subtitle">files uploaded</div>
+            </div>
+
+            <!-- Upload Statistics -->
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-icon" style="background: var(--success);">
+                        <span class="material-icons">trending_up</span>
+                    </div>
+                    <div class="stat-card-title">Recent Uploads</div>
+                </div>
+                <div class="stat-card-value">{{ recent_files|length }}</div>
+                <div class="stat-card-subtitle">in last 7 days</div>
+            </div>
+
+            <!-- Storage Chart -->
+            <div class="chart-container">
+                <h3>Storage Usage Over Time</h3>
+                <canvas id="storageChart"></canvas>
+            </div>
+
+            <!-- Recent Files -->
+            <div class="recent-files-section">
+                <h3>Recent Files</h3>
+                <div class="recent-files-grid">
+                    {% for file in recent_files %}
+                    <div class="file-card">
+                        <div class="file-info">
+                            <span class="material-icons">insert_drive_file</span>
+                            <span>{{ file.filename[:15] }}{% if file.filename|length > 15 %}...{% endif %}</span>
+                        </div>
+                        <div class="file-meta">
+                            <small>{{ "%.1f"|format(file.file_size / 1024) }} KB</small>
+                            <small>{{ file.created_at.strftime('%b %d') }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="recent-activities-section">
+                <h3>Recent Activities</h3>
+                {% for activity in recent_activities %}
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: var(--{{ 'error' if activity.action == 'delete' else 'primary' }});">
+                        <span class="material-icons">
+                            {% if activity.action == 'upload' %}upload_file
+                            {% elif activity.action == 'download' %}download
+                            {% elif activity.action == 'delete' %}delete
+                            {% elif activity.action == 'rename' %}edit
+                            {% elif activity.action == 'share' %}share
+                            {% else %}info
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-action">
+                            {% if activity.action == 'upload' %}Uploaded file
+                            {% elif activity.action == 'download' %}Downloaded file
+                            {% elif activity.action == 'delete' %}Deleted file
+                            {% elif activity.action == 'rename' %}Renamed file
+                            {% elif activity.action == 'share' %}Shared file
+                            {% else %}File activity
+                            {% endif %}
+                        </div>
+                        <div class="activity-meta">
+                            {{ activity.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+
+    <div class="theme-switcher theme-carousel" aria-label="Theme switcher">
+        <button id="theme-prev" class="theme-btn" aria-label="Previous theme">&lt;</button>
+        <div class="theme-display" id="theme-display" role="status" aria-live="polite" tabindex="0"></div>
+        <button id="theme-next" class="theme-btn" aria-label="Next theme">&gt;</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        // Storage Chart
+        const ctx = document.getElementById('storageChart').getContext('2d');
+        const storageChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Storage Usage (MB)',
+                    data: [{{ (total_size / 1024 / 1024) * 0.7 }}, {{ (total_size / 1024 / 1024) * 0.8 }}, {{ (total_size / 1024 / 1024) * 0.9 }}, {{ total_size / 1024 / 1024 }}],
+                    borderColor: 'var(--primary)',
+                    backgroundColor: 'var(--primary)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'var(--overlay)'
+                        },
+                        ticks: {
+                            color: 'var(--subtle)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'var(--overlay)'
+                        },
+                        ticks: {
+                            color: 'var(--subtle)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Real-time updates via WebSocket
+        const socket = io();
+        
+        socket.on('file_uploaded', function(data) {
+            // Update file count and recent files
+            location.reload();
+        });
+        
+        socket.on('activity_update', function(data) {
+            // Update activity feed
+            location.reload();
+        });
+        
+        socket.on('system_message', function(data) {
+            // Show system notifications
+            showNotification(data.message, data.type);
+        });
+
+        function showNotification(message, type = 'info') {
+            // Implementation for showing notifications
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    </script>
+</body>
+</html>

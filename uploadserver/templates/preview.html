@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="{{ theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview - {{ filename }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .preview-container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 1rem;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--overlay);
+        }
+        
+        .preview-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .preview-filename {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--primary);
+            word-break: break-all;
+        }
+        
+        .preview-meta {
+            font-size: 0.9rem;
+            color: var(--subtle);
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .preview-actions .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            min-width: auto;
+        }
+        
+        .preview-content {
+            background: var(--surface);
+            border: 1px solid var(--overlay);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            overflow: auto;
+            max-height: 70vh;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: var(--border-radius);
+        }
+        
+        .preview-text {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: var(--fg);
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            width: 100%;
+            min-height: 400px;
+        }
+        
+        .preview-error {
+            text-align: center;
+            color: var(--error);
+            padding: 2rem;
+        }
+        
+        .no-preview {
+            text-align: center;
+            color: var(--subtle);
+            padding: 2rem;
+        }
+        
+        .no-preview .material-icons {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .preview-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .preview-actions .btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container preview-container">
+        <header class="preview-header">
+            <div class="preview-info">
+                <h1 class="preview-filename">{{ filename }}</h1>
+                <div class="preview-meta">
+                    <span>Size: {{ "%.2f"|format(file_size / 1024) }} KB</span>
+                    {% if mime_type %}
+                        <span>Type: {{ mime_type }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="preview-actions">
+                <a href="{{ url_for('download', filename=filename) }}" class="btn">
+                    <span class="material-icons">download</span> Download
+                </a>
+                <a href="{{ url_for('browse', path=filename|dirname) }}" class="btn">
+                    <span class="material-icons">arrow_back</span> Back
+                </a>
+            </div>
+        </header>
+
+        <main class="preview-content">
+            {% if is_image %}
+                <img src="{{ url_for('download', filename=filename) }}" alt="{{ filename }}" class="preview-image">
+            {% elif is_text and content is not none %}
+                <textarea class="preview-text" readonly>{{ content }}</textarea>
+            {% else %}
+                <div class="no-preview">
+                    <span class="material-icons">preview_off</span>
+                    <h3>Preview Not Available</h3>
+                    <p>This file type cannot be previewed. Please download the file to view its contents.</p>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <div class="theme-switcher theme-carousel" aria-label="Theme switcher">
+        <button id="theme-prev" class="theme-btn" aria-label="Previous theme">&lt;</button>
+        <div class="theme-display" id="theme-display" role="status" aria-live="polite" tabindex="0"></div>
+        <button id="theme-next" class="theme-btn" aria-label="Next theme">&gt;</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
