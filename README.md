@@ -1,4 +1,4 @@
-# 🚀 UploadServer Pro
+# 🚀 UploadServer 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python versions](https://img.shields.io/pypi/pyversions/uploadserver.svg)](https://pypi.org/project/uploadserver/)
@@ -9,10 +9,6 @@
 > Think of it as Python's `http.server` on steroids with enterprise-level features.
 
 ![Demo](https://github.com/MuadzHdz/uploadserver/raw/main/docs/demo.gif)
-
-## ✨ Why UploadServer Pro?
-
-Born from the frustration of juggling multiple tools for simple file sharing, **UploadServer Pro** delivers a unified, secure, and elegant solution. Whether you're a developer sharing builds, a designer collaborating with clients, or just someone who needs to quickly share files across devices—this tool has your back.
 
 ### 🎯 Core Features
 
@@ -59,12 +55,11 @@ Born from the frustration of juggling multiple tools for simple file sharing, **
 ### Installation
 
 ```bash
-# Using pip (recommended)
-pip install uploadserver-pro
-
 # From source
 git clone https://github.com/MuadzHdz/uploadserver.git
 cd uploadserver
+python -m venv venv
+source venv/bin/activate
 pip install -e .
 ```
 
