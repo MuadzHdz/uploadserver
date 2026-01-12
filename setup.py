@@ -9,14 +9,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="uploadserverpro",
+    name="uploadserver",
     version=version,
     author="Mu'adz",
     author_email="adzhdz73@gmail.com",
-    description="UploadServer Pro: An enterprise-grade collaborative file sharing platform with real-time features, user management, and advanced search.",
+    description="UploadServer: An enterprise-grade collaborative file sharing platform with real-time features, user management, and advanced search.",
     long_description=long_description,
     long_description_content_type="",
-    url="https://github.com/MuadzHdz/uploadserverpro",
+    url="https://github.com/MuadzHdz/uploadserver",
     packages=find_packages(),
     include_package_data=True,
     classifiers=[
@@ -63,7 +63,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "uploadserverpro=uploadserver.advanced_server:main",
+            "uploadserver=uploadserver.advanced_server:main",
         ],
     },
 )
