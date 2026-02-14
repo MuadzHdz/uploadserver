@@ -91,7 +91,7 @@ class File(db.Model):
     thumbnail_path = db.Column(db.String(1000))
     preview_available = db.Column(db.Boolean, default=False)
     tags = db.Column(db.JSON, default=list)
-    metadata = db.Column(db.JSON, default=dict)
+    file_metadata = db.Column(db.JSON, default=dict)
     download_count = db.Column(db.Integer, default=0)
     last_accessed = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -130,7 +130,7 @@ class File(db.Model):
             "thumbnail_path": self.thumbnail_path,
             "preview_available": self.preview_available,
             "tags": self.tags,
-            "metadata": self.metadata,
+            "metadata": self.file_metadata,
             "download_count": self.download_count,
             "last_accessed": self.last_accessed.isoformat()
             if self.last_accessed

@@ -20,7 +20,7 @@ from .models import File, User
 class SearchEngine:
     def __init__(self, index_dir="search_index"):
         self.index_dir = index_dir
-        self.analyzer = StandardAnalyzer() | StemmingAnalyzer()
+        self.analyzer = StemmingAnalyzer()
         self.ensure_index_directory()
 
     def ensure_index_directory(self):
@@ -142,9 +142,9 @@ class SearchEngine:
 
             # Prepare metadata
             metadata_text = ""
-            if file_obj.metadata:
+            if file_obj.file_metadata:
                 metadata_text = " ".join(
-                    [str(v) for v in file_obj.metadata.values() if isinstance(v, str)]
+                    [str(v) for v in file_obj.file_metadata.values() if isinstance(v, str)]
                 )
 
             tags_text = " ".join(file_obj.tags) if file_obj.tags else ""
@@ -204,11 +204,11 @@ class SearchEngine:
 
                     # Prepare metadata
                     metadata_text = ""
-                    if file_obj.metadata:
+                    if file_obj.file_metadata:
                         metadata_text = " ".join(
                             [
                                 str(v)
-                                for v in file_obj.metadata.values()
+                                for v in file_obj.file_metadata.values()
                                 if isinstance(v, str)
                             ]
                         )
@@ -429,9 +429,9 @@ class SearchEngine:
                 )
 
             metadata_text = ""
-            if file_obj.metadata:
+            if file_obj.file_metadata:
                 metadata_text = " ".join(
-                    [str(v) for v in file_obj.metadata.values() if isinstance(v, str)]
+                    [str(v) for v in file_obj.file_metadata.values() if isinstance(v, str)]
                 )
 
             tags_text = " ".join(file_obj.tags) if file_obj.tags else ""
@@ -479,3 +479,6 @@ class SearchEngine:
             writer.commit(optimize=True)
         except Exception as e:
             print(f"Error optimizing index: {e}")
+
+
+SEARCH_ENGINE = SearchEngine()

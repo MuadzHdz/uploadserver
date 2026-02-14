@@ -100,7 +100,7 @@ def register_api_routes(app):
 
         if "metadata" in data:
             if isinstance(data["metadata"], dict):
-                file_obj.metadata.update(data["metadata"])
+                file_obj.file_metadata.update(data["metadata"])
 
         if "is_public" in data:
             file_obj.is_public = data["is_public"]

@@ -66,14 +66,9 @@ except ImportError:
 UPLOAD_DIRECTORY = os.getcwd()
 PASSWORD = None
 
-# Initialize extensions
-db = SQLAlchemy()
-socketio = SocketIO(cors_allowed_origins="*")
-login_manager = LoginManager()
-login_manager.login_view = "login"
-
 # Import models
 from .models import (
+    db,
     User,
     File,
     FileVersion,
@@ -87,6 +82,8 @@ from .search_engine import SearchEngine
 
 UPLOAD_DIRECTORY = os.getcwd()
 SEARCH_ENGINE = SearchEngine()
+
+login_manager = LoginManager()
 
 
 @login_manager.user_loader
@@ -126,6 +123,9 @@ def create_app():
     app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100MB max file size
 
     # Initialize extensions
+    socketio = SocketIO(cors_allowed_origins="*")
+    login_manager = LoginManager()
+    login_manager.login_view = "login"
     db.init_app(app)
     socketio.init_app(app, async_mode="threading")
     login_manager.init_app(app)
